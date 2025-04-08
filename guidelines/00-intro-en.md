@@ -27,7 +27,6 @@
       └── setup.go
 ```
 
-
 ## Main Principles
 
 The code must follow Clean Architecture with some aspects of Hexagonal Architecture:
@@ -55,24 +54,58 @@ The code must follow Clean Architecture with some aspects of Hexagonal Architect
 
 ## Correct Development Sequence
 
-1. **Start with Usecase**: 
-   - Define the usecase interface and algorithm
-   - Identify required gateways (still as empty interfaces)
-   - Focus on business flow and rules without being tied to infrastructure implementation
+1. **Initial Usecase Planning**:
+   - Define the usecase's purpose and basic requirements
+   - Draft the usecase request/response structures
+   - Identify all gateway dependencies needed for the usecase
+   - Focus on business flow and rules without implementation details
 
-2. **Implement Gateways**:
-   - Implement the gateways identified in the previous step
+2. **Scan Existing Models**:
+   - Review all domain models in the project's `model/` directory that relate to the usecase
+   - Determine which existing models can be reused or extended for the new usecase
+   - Identify any new models that need to be created to support the business requirements
+   - Note relationships between models that might affect the implementation
+   - Check for validation rules and business constraints already defined in existing models
+
+3. **Scan Existing Gateways**:
+   - Review existing gateway interfaces in the project's `gateway/` directory against the identified needs
+   - Check for reusable gateway implementations by examining all `.go` files in the `gateway/` folder
+   - Determine which existing gateways can be reused without modification
+   - Document which new gateways need to be created or which existing ones need to be extended
+   - Note any gateways that might need refactoring to accommodate new requirements
+
+4. **Implement Missing Gateways**:
+   - Create any gateways identified as missing but required
    - Prioritize gateways that could potentially be reused by other usecases
-   - Basic CRUD gateways can be implemented first as a foundation
+   - Implement basic CRUD gateways first as a foundation where needed
+   - Ensure proper error handling and infrastructure abstraction
 
-3. **Create Controllers**:
+5. **Implement Complete Usecase**:
+   - With all gateways now available, implement the full usecase logic
+   - Focus on business rules and orchestration of the gateways
+   - Handle all error cases and edge conditions
+   - Ensure pure business logic remains separate from infrastructure concerns
+
+6. **Create Controllers**:
    - Implement controllers that expose usecases (or gateways directly for simple CRUD operations)
    - Adapt to the protocol being used (HTTP, MQTT, gRPC, etc.)
+   - Handle protocol-specific parameter extraction and response formatting
+   - Document endpoints for API documentation
 
-4. **Setup Wiring**:
-   - Connect all components with dependency injection
+7. **Setup Wiring**:
+   - Connect all components with proper dependency injection
    - Apply middleware as needed (not all gateways or usecases must have middleware)
+   - Register controllers with their respective service handlers
+   - Ensure proper initialization order for all components
 
-5. **Unit Testing**:
+8. **Unit Testing**:
    - Create unit tests for usecases with gateway mocking
    - Verify usecase behavior in various scenarios
+   - Test error paths and edge cases
+   - Ensure coverage of critical business logic
+
+9. **Integration Testing**:
+   - Test the flow through controllers, usecases, and gateways working together
+   - Verify middleware behavior and proper context propagation
+   - Test error handling across component boundaries
+   - Validate that all components interact as expected in the wired application

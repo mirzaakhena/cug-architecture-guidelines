@@ -1,11 +1,38 @@
 ## Rules for GATEWAY Implementation
 
+### Gateway Naming Conventions
+
+When implementing gateways in our clean architecture, follow these naming patterns for consistency and clarity:
+
+#### Standard Pattern: `[Object][Action]`
+
+Use the format `[Object][Action]` for all gateways where:
+- `Object` is the domain entity or resource being operated on
+- `Action` is the operation being performed
+
+Examples:
+- `UserSave` - Saves a user to the database
+- `UserFindOne` - Retrieves a single user
+- `UserFindMany` - Retrieves multiple users
+- `MessagePublish` - Publishes a message to a queue
+- `AgentActivate` - Activates an agent
+
+This naming convention provides natural grouping in file systems and code editors, making related gateways easy to locate.
+
+#### System Operations: `System[Action]`
+
+For non-deterministic utility operations without a clear domain entity, use `System` as the object:
+
+- `SystemGenerateUUID` - Generates a UUID
+- `SystemGenerateRandomString` - Generates a random string
+- `SystemGetCurrentTime` - Retrieves the current time
+
+This maintains our naming pattern consistency while providing a logical home for operations that don't belong to a specific domain entity.
+
 ### ✅ REQUIRED
 - Create **each gateway for ONE specific task** (Single Responsibility)
 - Structure gateways as **functions rather than structs/interfaces**
 - Use the `core.ActionHandler[Req, Res]` type for consistency
-- Define clear request & response structs with naming convention: `[GatewayName]Req` and `[GatewayName]Res`
-- Implement using closure pattern: `func Impl[GatewayName](dependencies) [GatewayName] { return func(ctx, req) {} }`
 - Include comprehensive comments for each gateway
 - Wrap errors with context: `fmt.Errorf("failed to...: %w", err)`
 - Always return pointers: `(*Response, error)`
@@ -32,20 +59,20 @@
 ### 📝 EXAMPLE
 
 ```go
-// FindUserByEmail gateway
-type FindUserByEmailReq struct {
+// UserFindByEmail gateway
+type UserFindByEmailReq struct {
     Email string
 }
 
-type FindUserByEmailRes struct {
+type UserFindByEmailRes struct {
     Exists bool
     User   *User // Only populated if user exists
 }
 
-type FindUserByEmail = core.ActionHandler[FindUserByEmailReq, FindUserByEmailRes]
+type UserFindByEmail = core.ActionHandler[UserFindByEmailReq, UserFindByEmailRes]
 
-func ImplFindUserByEmail(db *gorm.DB) FindUserByEmail {
-    return func(ctx context.Context, req FindUserByEmailReq) (*FindUserByEmailRes, error) {
+func ImplUserFindByEmail(db *gorm.DB) UserFindByEmail {
+    return func(ctx context.Context, req UserFindByEmailReq) (*UserFindByEmailRes, error) {
 
         // Get transaction from context if available
         dbCtx := middleware.GetDBFromContext(ctx, db)
@@ -55,7 +82,7 @@ func ImplFindUserByEmail(db *gorm.DB) FindUserByEmail {
         
         if result.Error != nil {
             if result.Error == gorm.ErrRecordNotFound {
-                return &FindUserByEmailRes{
+                return &UserFindByEmailRes{
                     Exists: false,
                     User:   nil,
                 }, nil
@@ -63,9 +90,10 @@ func ImplFindUserByEmail(db *gorm.DB) FindUserByEmail {
             return nil, fmt.Errorf("database error: %w", result.Error)
         }
         
-        return &FindUserByEmailRes{
+        return &UserFindByEmailRes{
             Exists: true,
             User:   &user,
         }, nil
     }
 }
+```
