@@ -27,6 +27,7 @@
       └── setup.go
 ```
 
+
 ## Main Principles
 
 The code must follow Clean Architecture with some aspects of Hexagonal Architecture:
@@ -48,11 +49,16 @@ The code must follow Clean Architecture with some aspects of Hexagonal Architect
 
 3. **Common Types**:
    - Use `core.ActionHandler[Request, Response]` as the standard function type for Usecases and Gateways
-   - All functions accept context.Context as the first parameter
+   - All functions accept `context.Context` as the first parameter
    - This type supports functional composition and avoids "fat interface" problems
    - Request and Response use structs with consistent naming (GatewayNameReq/Res, UsecaseNameReq/Res)
 
 ## Correct Development Sequence
+
+The development process is divided into three main phases, each with specific focus areas and documentation resources. Follow this sequence for optimal implementation:
+
+### Phase 1: Usecase Planning & Gateway Implementation
+**Documentation Resources: [01-usecase.md], [02-gateway.md]**
 
 1. **Initial Usecase Planning**:
    - Define the usecase's purpose and basic requirements
@@ -80,6 +86,9 @@ The code must follow Clean Architecture with some aspects of Hexagonal Architect
    - Implement basic CRUD gateways first as a foundation where needed
    - Ensure proper error handling and infrastructure abstraction
 
+### Phase 2: Usecase & Controller Implementation
+**Documentation Resources: [01-usecase.md], [03-controller-http-read.md], [03-controller-http-write.md], [03-controller-subscriber.md], [03-controller-scheduler.md]**
+
 5. **Implement Complete Usecase**:
    - With all gateways now available, implement the full usecase logic
    - Focus on business rules and orchestration of the gateways
@@ -88,15 +97,25 @@ The code must follow Clean Architecture with some aspects of Hexagonal Architect
 
 6. **Create Controllers**:
    - Implement controllers that expose usecases (or gateways directly for simple CRUD operations)
+   - Choose the appropriate controller type based on exposure requirements:
+     - HTTP Read: `03-controller-http-read.md` (for GET endpoints)
+     - HTTP Write: `03-controller-http-write.md` (for POST/PUT/DELETE endpoints)
+     - Message Queue: `03-controller-subscriber.md` (for async messaging)
+     - Scheduler: `03-controller-scheduler.md` (for time-based operations)
    - Adapt to the protocol being used (HTTP, MQTT, gRPC, etc.)
    - Handle protocol-specific parameter extraction and response formatting
    - Document endpoints for API documentation
 
+### Phase 3: Wiring & Testing
+**Documentation Resources: [04-middleware.md], [05-wiring.md]**
+
 7. **Setup Wiring**:
    - Connect all components with proper dependency injection
    - Apply middleware as needed (not all gateways or usecases must have middleware)
+   - Use the patterns documented in `04-middleware.md` for cross-cutting concerns
    - Register controllers with their respective service handlers
    - Ensure proper initialization order for all components
+   - Follow the structure outlined in `05-wiring.md`
 
 8. **Unit Testing**:
    - Create unit tests for usecases with gateway mocking

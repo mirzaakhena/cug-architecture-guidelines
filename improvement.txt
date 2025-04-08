@@ -91,3 +91,29 @@ Conditional Middleware: The document doesn't address strategies for conditionall
 Initialization Order: While the component setup order is mentioned, there's no guidance on overall initialization order for multiple domains/modules.
 Error Handling During Initialization: There's no guidance on how to handle errors that may occur during the wiring process.
 
+
+Saya terpikirkan untuk melakukan extensi dokumentasi dengan membuat dokumen utama yang akan mengarahkan AI untuk membaca dokumen yang terkait dengan task nya. 
+Contohnya adalah dokumen utama "00-intro-en.md" yang mencantumkan semacam :
+
+```
+## Getting Started with Clean Architecture
+
+Depending on the component you're building, refer to these specific guides:
+
+- [Implementing Use Cases](01-usecase-en.md) - For business logic implementation
+- [Creating Gateways](02-gateway-en.md) - For infrastructure interactions
+- [HTTP Controllers](03-controller-http-en.md) - For RESTful API endpoints
+- [Message Queue Controllers](03-controller-subscriber-en.md) - For async message handling
+- [Scheduler Controllers](03-controller-scheduler-en.md) - For time-based operations
+- [Common Middleware](04-middleware-en.md) - For cross-cutting concerns
+- [Dependency Wiring](05-wiring-en.md) - For connecting components
+- [Testing Strategies](06-testing-general-en.md) - For ensuring quality
+- [Error Handling](07-error-handling-en.md) - For robust error management
+```
+
+Saya ingin kamu membuat semacam itu tapi sesuaikan dengan dokumen yang saya sertakan pada project knowledge.
+
+Saya juga terpikirkan untuk melakukan pemisahkan fase development menjadi beberapa bagian sehingga bisa lebih spesifik lagi bagi AI agent untuk membaca dokumen yang terkait dengan task nya:
+- Fase pembuatan Usecase 
+- Fase pembuatan controller
+- Fase wiring
