@@ -28,6 +28,7 @@
 - Different error types can provide more context about failure modes
 - Use domain-specific error types to make error handling more informative
 - Consider how context values are propagated through to gateways for tracing and cancellation
+- Ensure usecases are testable through proper dependency injection
 - When returning errors, wrap them with sufficient context for debugging and user feedback
 
 ### 📝 EXAMPLE

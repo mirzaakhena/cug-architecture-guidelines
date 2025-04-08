@@ -45,7 +45,6 @@ This maintains our naming pattern consistency while providing a logical home for
 - NEVER return database errors directly without wrapping
 - NEVER hardcode values that should be parameters
 - NEVER call other gateways from a gateway
-- NEVER implement non-deterministic functions (time.Now(), uuid.New()) in usecases
 
 ### 💡 IMPORTANT TO REMEMBER
 - Gateways are responsible for all non-deterministic operations
@@ -53,7 +52,6 @@ This maintains our naming pattern consistency while providing a logical home for
 - Gateways can access infrastructure like databases, APIs, files, or external functions
 - Gateways are the appropriate place for time.Now(), UUID generation, random number generation, etc.
 - Consider categories of gateways (database, external API, file system) and their specific requirements
-- Ensure gateways are testable through proper dependency injection
 - Use appropriate error types for different scenarios (e.g., distinguishing between not found vs. server errors)
 
 ### 📝 EXAMPLE

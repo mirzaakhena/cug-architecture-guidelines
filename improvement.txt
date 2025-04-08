@@ -1,0 +1,93 @@
+Saya ingin menambahkan informasi pada dokumentasi usecase agar Semua Gateway pada parameter UseCase function harus dan pasti digunakan didalam implementasi.
+Karena saya menemukan ada kasus dimana ada UseCase dengan 3 Gateways, namun hanya satu Gateway saja yang digunakan.
+
+Saya ingin ai agent tahu kapan harus menyisipkan import yang sesuai. 
+Ada kasus dimana AI Agent membuat model tanpa meng-import salah satu package. dalam hal ini adalah `time`
+Ada juga kasus sebaliknya, dimana AI Agent mengimport package yang tidak digunakan.
+
+Ada kasus dimana AI Agent secara inisiatif membuat pemisahan file antara type definition dengan implementation
+
+
+Tentang "Urutan Pengembangan yang Benar", saya malah terpikirkan untuk memulai justru dari usecase. 
+Memulai dari gateway justru tidak natural bagi manusia (mungkin tidak bagi AI ya?). 
+Dari gateway kita bisa membuat algoritmanya dulu dan bisa melibatkan gateway-gateway yang masih kosong implementasinya. 
+Setelah usecase selesai barulah beralih mengisi implementasi gateway-gateway yang kosong tadi. 
+Menjadi "bonus" bagi pengembangan usecase berikutnya jika usecase tersebut menggunakan gateway yang implementasinya sudah dibuat sebelumnya. 
+
+
+Konvensi penamaan gateway
+
+gateway ini akan sangat banyak.  Gunakan konvensi penamaan dengan :
+Nama Model / Object lalu diikuti dengan nama Action misal :
+
+- UserSave
+- UserDelete
+- UserUpdate
+- UserFindOne
+- UserFindMany
+- MessagePublish
+
+Alasan penamaan dengan cara tersebut adalah mengambil manfaat dari pengurutan nama file system sehingga bisa tergrouping secara natural
+Namun Ada beberapa pengecualian pada konvensi ini khususnya untuk :
+
+- GenerateUUID
+- GenerateRandomString
+- GetCurrentTime
+
+Saya kurang suka dengan pengecualian ini. Ini sebenarnya menjadi tidak konsisten dengan konvensi gateway yang ada. 
+Tapi jika dibalik, rasanya kok seperti aneh dan janggal. Apakah kamu ada ide nama yang lebih baik untukk kasus ini ?
+
+
+Saya juga terpikir memisahkan controller dalam beberapa contoh umum sehingga dari dokumen utama "00-intro-en.md", 
+saya bisa membuat anchor link yang akan mengarahkan AI untuk membaca dokumen yang terkait dengan task nya.
+hal ini bertujuan untuk mereduksi context window. 
+Rencananya dalam dokumen utama ada pengarahan untuk membaca dokumen tertentu sebagai tambahan informasi
+
+1. jika kamu ingin membuat use case maka baca dokumen "01-usecase-en.md"
+2. jika kamu ingin membuat gateway maka baca "02-gateway-en.md"
+3. jika kamu ingin membuat controller http API maka baca "03-controller-http-en.md"
+4. jika kamu ingin membuat controller untuk broker subscriber maka baca "03-controller-subscriber-en.md"
+5. jika kamu ingin membuat controller untuk scheduler maka baca "03-controller-scheduler-en.md"
+
+baca  : https://claude.ai/chat/9acf537b-4916-4de3-9b2a-b0ac44240932
+
+
+Menambahkan informasi khususnya tentang AI harus melakukan pengecekan existing model atau gateway sehingga bisa di re-use
+Kenapa hanya model dan gateway ? karena hanya model dan gateway yang di-reuse dalam usecase, gateway dan controller
+usecase hampir tidak mungkin untuk di re-use, meskipun ada rules dimana usecase boleh diakses oleh lebih dari satu controller yang berbeda.
+
+Areas for Consideration UseCase :
+Validation Strategy: The example shows validation in the request struct, but this could lead to duplication across similar requests. Consider mentioning validation libraries or shared validation strategies.
+Error Domain Knowledge: While you properly emphasize error wrapping, you might want to address domain-specific error types for more contextual error handling.
+Complexity Management: For very complex usecases, you could expand on strategies to break them down (private helper functions vs. splitting into multiple usecases).
+Context Propagation: The document doesn't specifically address how context values should be propagated through the usecase to gateways, which can be important for request tracing, cancellation, etc.
+Return Values: While you correctly emphasize returning pointers for responses, you might want to clarify when a nil response with a non-nil error is appropriate versus returning a valid response with error information inside it.
+
+Areas for Consideration Gateway :
+Gateway Dependencies: While it correctly prohibits calling other gateways from a gateway, the document doesn't provide guidance on what dependencies are appropriate for gateways (e.g., database connections, HTTP clients, etc.).
+Error Types: Similar to the usecase document, there could be more specific guidance on error types and when to use core.NewInternalServerError() versus regular errors.
+Testing Considerations: There's no mention of how to make gateways testable, which could include guidance on interface-based dependencies or test doubles.
+Gateway Categorization: The document could benefit from mentioning different categories of gateways (database, external API, file system, etc.) and any specific considerations for each.
+Retry Mechanisms: There's no guidance on whether gateways should implement retries internally or if that should be strictly handled by middleware.
+
+Areas for Consideration Controller :
+Parameter Extraction Complexity: The document mentions extracting parameters from different sources (path, query, body) but doesn't fully address the complexity of reconciling these different sources.
+Validation Responsibility: There's no clear guidance on whether validation should happen in the controller or be delegated to the usecase (which was mentioned in the usecase document).
+Error Response Customization: There's limited guidance on customizing error responses based on different error types or scenarios.
+Authentication/Authorization: The document doesn't address how authentication/authorization should be handled at the controller level, which is often a key responsibility.
+Input Transformation: There's limited guidance on transforming inputs from the protocol-specific format to the usecase request format, especially for more complex transformations.
+
+Areas for Consideration Middleware :
+Middleware Ordering: While the document mentions that middleware ordering is important in the IMPORTANT TO REMEMBER section, it could benefit from more specific guidance on recommended ordering for common middleware combinations.
+Error Transformation: There's no specific guidance on whether middleware should transform or enrich error types returned by the usecase.
+Context Value Types: There's no guidance on what types of values should be added to context within middleware and any conventions around context keys.
+Performance Considerations: The document doesn't address potential performance implications of certain middleware types (like logging large objects).
+Testing Middleware: There's no mention of strategies for testing middleware components.
+
+Areas for Consideration Wiring :
+Domain Grouping: While the document mentions organizing wiring by domain or functional module, it could provide more specific guidance on how to structure this for larger applications.
+Configuration Management: There's no mention of how to handle environment-specific configuration in the wiring setup.
+Conditional Middleware: The document doesn't address strategies for conditionally applying middleware based on environment or configuration.
+Initialization Order: While the component setup order is mentioned, there's no guidance on overall initialization order for multiple domains/modules.
+Error Handling During Initialization: There's no guidance on how to handle errors that may occur during the wiring process.
+

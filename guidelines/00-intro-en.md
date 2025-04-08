@@ -27,6 +27,7 @@
       └── setup.go
 ```
 
+
 ## Main Principles
 
 The code must follow Clean Architecture with some aspects of Hexagonal Architecture:
@@ -48,7 +49,7 @@ The code must follow Clean Architecture with some aspects of Hexagonal Architect
 
 3. **Common Types**:
    - Use `core.ActionHandler[Request, Response]` as the standard function type for Usecases and Gateways
-   - All functions accept context.Context as the first parameter
+   - All functions accept `context.Context` as the first parameter
    - This type supports functional composition and avoids "fat interface" problems
    - Request and Response use structs with consistent naming (GatewayNameReq/Res, UsecaseNameReq/Res)
 
